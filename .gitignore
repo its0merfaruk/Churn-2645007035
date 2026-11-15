@@ -1,0 +1,7 @@
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
+# Ham veri depoya konmaz (ödev kuralı)
+data/*.csv
+data/*.zip
