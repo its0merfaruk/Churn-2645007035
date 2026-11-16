@@ -1,7 +1,4 @@
-# Veri Madenciliği Dönem Projesi – Proje 2: Müşteri Kaybı (Churn) Tahmini
-
-- Öğrenci: <ad soyad> – <numara>
-- SEED: <numaranın son 4 hanesi> (`src/config.py` içinde)
+# Veri Madenciliği Dönem Projesi – Müşteri Kaybı (Churn) Tahmini
 
 ## Veri seti
 Telco Customer Churn (Kaggle, IBM örnek verisi). Ham veri depoda YOKTUR.
