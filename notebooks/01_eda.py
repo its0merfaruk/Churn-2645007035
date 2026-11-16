@@ -40,10 +40,21 @@ df["TotalCharges"] = sayi
 df["Churn"] = (df["Churn"] == "Yes").astype(int)
 print(df["Churn"].value_counts())
 
+# Sütun adlarının Türkçe karşılıkları (sadece grafikte görünür, tablodaki adlar değişmez)
+TR = {
+    "tenure": "Müşterilik süresi (ay)",
+    "MonthlyCharges": "Aylık ücret ($)",
+    "TotalCharges": "Toplam ücret ($)",
+    "SeniorCitizen": "Yaşlı müşteri",
+    "Churn": "Ayrılma",
+    "Contract": "Sözleşme türü",
+}
+
 # GRAFİK 1: kalan ve ayrılan müşteri sayısı
 sayilar = df["Churn"].value_counts().sort_index()      # sırayla 0 ve 1
 sayilar.index = ["Kalan", "Ayrılan"]                   # etiketleri okunur yap
-sayilar.plot(kind="bar", color=["tab:blue", "tab:red"])
+ax = sayilar.plot(kind="bar", color=["tab:blue", "tab:red"])  # grafiği "ax" adıyla tut
+ax.bar_label(ax.containers[0])                                # her çubuğun üstüne sayısını yaz
 plt.title("Hedef değişken dağılımı")
 plt.ylabel("Müşteri sayısı")
 plt.xticks(rotation=0)                                 # yazılar yatay dursun
@@ -56,7 +67,9 @@ fig, eksenler = plt.subplots(1, 2, figsize=(10, 4))    # yan yana 2 kutu
 for ax, sutun in zip(eksenler, ["tenure", "MonthlyCharges"]):
     for deger, ad in [(0, "Kalan"), (1, "Ayrılan")]:
         ax.hist(df.loc[df["Churn"] == deger, sutun], bins=30, alpha=0.6, label=ad)
-    ax.set_title(sutun)
+    ax.set_title(TR[sutun])           # Türkçe başlık
+    ax.set_xlabel(TR[sutun])          # yatay eksen adı
+    ax.set_ylabel("Müşteri sayısı")   # dikey eksen adı
     ax.legend()
 plt.tight_layout()
 plt.savefig("results/g2_histogramlar.png", dpi=150)
@@ -68,9 +81,9 @@ sayisal = ["tenure", "MonthlyCharges", "TotalCharges"]   # sayısal sütunlarım
 fig, eksenler = plt.subplots(1, 3, figsize=(12, 4))
 for ax, sutun in zip(eksenler, sayisal):
     df.boxplot(column=sutun, by="Churn", ax=ax)   # Churn'e göre iki kutu çiz
-    ax.set_title(sutun)
-    ax.set_xlabel("Churn (0 = kaldı, 1 = ayrıldı)")
-fig.suptitle("")                                  # pandas'ın otomatik başlığını sil
+    ax.set_title(TR[sutun])           # Türkçe başlık
+    ax.set_xlabel(TR["Churn"] + " (0 = kaldı, 1 = ayrıldı)")   # yatay eksen adı
+    fig.suptitle("")                                  # pandas'ın otomatik başlığını sil
 plt.tight_layout()
 plt.savefig("results/g3_kutu_grafikleri.png", dpi=150)
 plt.close()
@@ -86,10 +99,13 @@ for sutun in sayisal:
 # GRAFİK 4: sözleşme türüne göre ayrılma oranı
 # Churn 0/1 olduğu için ortalaması = ayrılanların oranı
 oran = df.groupby("Contract")["Churn"].mean().sort_values() * 100
+# Sözleşme türlerini Türkçeleştir
+oran = oran.rename({"Month-to-month": "Aylık", "One year": "1 yıllık", "Two year": "2 yıllık"})
 oran.plot(kind="bar", color="tab:orange")
 plt.ylabel("Ayrılma oranı (%)")
 plt.title("Sözleşme türüne göre churn oranı")
 plt.xticks(rotation=0)
+plt.xlabel(TR["Contract"])       # eksen adı
 plt.tight_layout()
 plt.savefig("results/g4_sozlesme_churn.png", dpi=150)
 plt.close()
@@ -97,7 +113,7 @@ plt.close()
 # GRAFİK 5: korelasyon matrisi (sütunlar birbirine ne kadar bağlı?)
 korelasyon = df[sayisal + ["SeniorCitizen", "Churn"]].corr()
 plt.figure(figsize=(6, 5))
-sns.heatmap(korelasyon, annot=True, fmt=".2f", cmap="coolwarm", center=0)
+sns.heatmap(korelasyon.rename(index=TR, columns=TR), annot=True, fmt=".2f", cmap="coolwarm", center=0)
 plt.title("Korelasyon matrisi")
 plt.tight_layout()
 plt.savefig("results/g5_korelasyon.png", dpi=150)
